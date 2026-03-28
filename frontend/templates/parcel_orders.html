@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Parcel orders{% endblock %}
+{% block heading %}Parcel / takeaway{% endblock %}
+{% block subheading %}Customer details and items{% endblock %}
+{% block content %}
+<form method="post" class="order-grid">
+  <div class="card">
+    <h3>Customer</h3>
+    <label class="field">
+      <span>Name</span>
+      <input name="customer_name" required />
+    </label>
+    <label class="field">
+      <span>Phone</span>
+      <input name="customer_phone" required />
+    </label>
+    <div class="menu-search field">
+      <span>Search menu</span>
+      <input id="menuSearch" type="search" placeholder="Type to filter..." />
+    </div>
+    <div id="menuList">
+      {% for item in menu %}
+      <div
+        class="menu-row menu-item"
+        data-search="{{ item.name }} {{ item.category }}"
+        data-item-id="{{ item.item_id }}"
+        data-name="{{ item.name }}"
+        data-category="{{ item.category }}"
+        data-price="{{ item.price }}"
+      >
+        <div>
+          <strong>{{ item.name }}</strong>
+          <div class="muted small">{{ item.category }}</div>
+        </div>
+        <div>₹ {{ '%.2f'|format(item.price|float) }}</div>
+        <div>
+          <input
+            class="qty-input"
+            type="number"
+            min="0"
+            value="0"
+            data-item-id="{{ item.item_id }}"
+          />
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="items_json" id="itemsJson" value="[]" />
+  </div>
+  <div class="card">
+    <h3>Summary</h3>
+    <div id="orderSummary"><p class="muted">No items yet.</p></div>
+    <div class="menu-item" style="margin-top: 10px">
+      <strong>Total</strong>
+      <strong id="orderTotal">₹ 0.00</strong>
+    </div>
+    <button class="btn btn-primary btn-block mt" type="submit">Create parcel order</button>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/order-cart.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    OrderCart.bind({
+      menuListId: 'menuList',
+      hiddenInputId: 'itemsJson',
+      summaryId: 'orderSummary',
+      totalId: 'orderTotal',
+      searchId: 'menuSearch'
+    });
+  });
+</script>
+{% endblock %}

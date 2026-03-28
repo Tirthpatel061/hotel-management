@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block heading %}Attendance{% endblock %}
+{% block subheading %}Mark daily presence for each staff member{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" class="grid grid-2" style="align-items:end;">
+    <label class="field">
+      <span>Date</span>
+      <input type="date" name="att_date" value="{{ att_date.isoformat() }}" />
+    </label>
+    <button class="btn btn-secondary" type="submit">Load</button>
+  </form>
+</div>
+<form method="post" class="card mt">
+  <input type="hidden" name="att_date" value="{{ att_date.isoformat() }}" />
+  <h3>Mark attendance — {{ att_date.strftime('%d %b %Y') }}</h3>
+  <div style="overflow:auto;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Staff</th>
+          <th>Role</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in staff_rows %}
+        <tr>
+          <td>{{ s.name }}</td>
+          <td>{{ s.role }}</td>
+          <td>
+            <select name="status_{{ s.staff_id }}">
+              <option value="present" {% if records.get(s.staff_id, 'present') == 'present' %}selected{% endif %}>Present</option>
+              <option value="absent" {% if records.get(s.staff_id) == 'absent' %}selected{% endif %}>Absent</option>
+            </select>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <button class="btn btn-primary mt" type="submit">Save attendance</button>
+</form>
+<div class="card mt">
+  <h3>Recent history</h3>
+  <div style="overflow:auto;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Staff ID</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in history %}
+        <tr>
+          <td>{{ h.att_date }}</td>
+          <td>{{ h.staff_id }}</td>
+          <td>{{ h.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

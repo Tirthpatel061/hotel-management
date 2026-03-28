@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Kitchen{% endblock %}
+{% block heading %}Kitchen dashboard{% endblock %}
+{% block subheading %}Advance orders: Preparing → Ready → Served / Delivered{% endblock %}
+{% block actions %}
+<div class="pill">Live orders: <span id="kitchen-live">—</span></div>
+{% endblock %}
+{% block content %}
+<div class="kitchen-grid">
+  {% for order in orders %}
+  <div class="kitchen-card">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+      <div>
+        <div class="pill">{{ order.order_type }}</div>
+        <h3 style="margin:8px 0 4px;">
+          {% if order.order_type == 'table' and order.table %}
+            {{ order.table.table_number }}
+          {% elif order.order_type == 'parcel' %}
+            Parcel — {{ order.parcel_customer_name }}
+          {% else %}
+            Order #{{ order.order_id }}
+          {% endif %}
+        </h3>
+        <div class="muted small">#{{ order.order_id }} · {{ order.order_time.strftime('%Y-%m-%d %H:%M') }}</div>
+        {% if order.order_type == 'parcel' %}
+        <div class="muted small">{{ order.parcel_phone }}</div>
+        {% endif %}
+      </div>
+      <div class="pill">{{ order.status }}</div>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in order.items %}
+        <tr>
+          <td>{{ line.menu_item.name }}</td>
+          <td>{{ line.quantity }}</td>
+          <td>₹ {{ '%.2f'|format(line.price|float) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <form method="post" action="{{ url_for('kitchen.update_status', order_id=order.order_id) }}">
+      <button class="btn btn-primary" type="submit">Mark next status</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="card"><p class="muted">No active kitchen orders.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var el = document.getElementById('kitchen-live');
+    if (window.HotelLive && el) {
+      HotelLive.watchSummary(el);
+    }
+  });
+</script>
+{% endblock %}

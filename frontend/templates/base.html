@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ brand_name }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  </head>
+  <body class="{% block body_class %}{% endblock %}">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand brand-sidebar">
+          <div class="brand-logo-wrap">
+            <img
+              class="brand-logo"
+              src="{{ url_for('static', filename=brand_logo) }}"
+              alt="{{ brand_name }}"
+            />
+          </div>
+          <div class="brand-text">
+            <div class="brand-title">{{ brand_name }}</div>
+            <p class="brand-sub">{{ brand_tagline }}</p>
+            <p class="brand-sub brand-sub-2">{{ brand_tagline_2 }}</p>
+          </div>
+        </div>
+        <div class="brand-meta">
+          <div class="brand-links">
+            <a href="{{ brand_website }}" target="_blank" rel="noopener noreferrer">Website</a>
+            <a href="{{ brand_menu_pdf }}" target="_blank" rel="noopener noreferrer">Menu PDF</a>
+            <a href="{{ brand_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          </div>
+          <p class="muted small">Family restaurant · since {{ brand_since }}</p>
+          <details class="outlets-acc">
+            <summary>Outlets · Vadodara</summary>
+            <ul class="outlet-list">
+              {% for o in brand_outlets %}
+              <li>
+                <strong>{{ o.name }}</strong>
+                <span class="muted small">{{ o.address }}</span>
+                <a href="{{ o.maps }}" target="_blank" rel="noopener noreferrer">Map</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </details>
+        </div>
+        <nav class="nav">
+          <a class="nav-link" href="{{ url_for('dashboard.index') }}">Dashboard</a>
+          <a class="nav-link" href="{{ url_for('orders.table_orders') }}">Table orders</a>
+          <a class="nav-link" href="{{ url_for('orders.parcel_orders') }}">Parcel orders</a>
+          <a class="nav-link" href="{{ url_for('kitchen.board') }}">Kitchen</a>
+          <a class="nav-link" href="{{ url_for('billing.list_bills') }}">Billing</a>
+          {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+          <div class="nav-section">Admin</div>
+          <a class="nav-link" href="{{ url_for('menu.list_menu') }}">Menu</a>
+          <a class="nav-link" href="{{ url_for('staff.list_staff') }}">Staff</a>
+          <a class="nav-link" href="{{ url_for('attendance.page') }}">Attendance</a>
+          <a class="nav-link" href="{{ url_for('salary.page') }}">Salary</a>
+          <a class="nav-link" href="{{ url_for('reports.page') }}">Reports</a>
+          {% endif %}
+        </nav>
+        <div class="sidebar-footer">
+          {% if current_user.is_authenticated %}
+          <div class="user-pill">
+            <span>{{ current_user.username }}</span>
+            <small>{{ current_user.role }}</small>
+          </div>
+          <a class="btn btn-ghost" href="{{ url_for('auth.logout') }}">Logout</a>
+          {% endif %}
+        </div>
+      </aside>
+      <div class="main">
+        <header class="topbar">
+          <div>
+            <h1 class="page-title">{% block heading %}{% endblock %}</h1>
+            <p class="page-sub">{% block subheading %}{% endblock %}</p>
+          </div>
+          <div class="topbar-actions">{% block actions %}{% endblock %}</div>
+        </header>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <main class="content">{% block content %}{% endblock %}</main>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/live.js') }}" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — {{ brand_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  </head>
+  <body class="auth-body">
+    <div class="auth-card">
+      <div class="brand brand-center brand-stack brand-stack--auth">
+        <div class="brand-logo-wrap brand-logo-wrap--auth">
+          <img
+            class="brand-logo brand-logo-lg"
+            src="{{ url_for('static', filename=brand_logo) }}"
+            alt="{{ brand_name }}"
+          />
+        </div>
+        <div class="brand-text brand-text--auth">
+          <div class="brand-title">{{ brand_name }}</div>
+          <p class="brand-sub">{{ brand_tagline }}</p>
+          <p class="brand-sub brand-sub-2">{{ brand_tagline_2 }}</p>
+          <p class="brand-sub brand-sub-muted">Staff sign in</p>
+        </div>
+      </div>
+      <div class="brand-meta brand-meta-center">
+        <div class="brand-links">
+          <a href="{{ brand_website }}" target="_blank" rel="noopener noreferrer">swagatcorner.com</a>
+          <a href="{{ brand_menu_pdf }}" target="_blank" rel="noopener noreferrer">Menu PDF</a>
+          <a href="{{ brand_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        </div>
+        <p class="muted small">Since {{ brand_since }} · Vadodara</p>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flash-stack">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+      <form method="post" class="form-grid">
+        <label class="field">
+          <span>Username</span>
+          <input name="username" autocomplete="username" required />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+      </form>
+      <p class="muted small">Default demo: <strong>admin</strong> / <strong>admin123</strong> (after seed)</p>
+    </div>
+  </body>
+</html>

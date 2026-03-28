@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Salary{% endblock %}
+{% block heading %}Salary management{% endblock %}
+{% block subheading %}Pro-rated by attendance (Mon–Sat working days){% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" class="grid grid-2" style="align-items:end;">
+    <label class="field">
+      <span>Month</span>
+      <input type="month" name="month_year" value="{{ month_year }}" />
+    </label>
+    <button class="btn btn-secondary" type="submit">Load</button>
+  </form>
+  <form method="post" class="mt">
+    <input type="hidden" name="month_year" value="{{ month_year }}" />
+    <input type="hidden" name="action" value="compute" />
+    <button class="btn btn-primary" type="submit">Compute / refresh salaries</button>
+  </form>
+</div>
+<div class="card mt">
+  <h3>Records for {{ month_year }}</h3>
+  <div style="overflow:auto;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Staff</th>
+          <th>Base</th>
+          <th>Present</th>
+          <th>Working days</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td>{{ r.staff.name }}</td>
+          <td>₹ {{ '%.2f'|format(r.base_salary|float) }}</td>
+          <td>{{ r.present_days }}</td>
+          <td>{{ r.working_days }}</td>
+          <td>₹ {{ '%.2f'|format(r.total_salary|float) }}</td>
+          <td>{{ r.payment_status }}</td>
+          <td>
+            {% if r.payment_status != 'Paid' %}
+            <form method="post" action="{{ url_for('salary.mark_paid', salary_id=r.salary_id) }}" style="display:inline;">
+              <button class="btn btn-secondary" type="submit">Mark paid</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7"><p class="muted">No salary records yet. Run compute for this month.</p></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

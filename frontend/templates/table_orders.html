@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Table orders{% endblock %}
+{% block heading %}Table orders{% endblock %}
+{% block subheading %}First submit prints a kitchen ticket (KOT). Extra items on the same table are saved to the same order — print the final bill from Billing when done.{% endblock %}
+{% block content %}
+<form method="post" class="order-grid" id="tableOrderForm">
+  <div class="card">
+    <h3>Order details</h3>
+    <p id="tableOrderHint" class="flash flash-info" style="display: none;"></p>
+    <label class="field">
+      <span>Table</span>
+      <select name="table_id" id="tableIdSelect" required>
+        {% for t in tables %}
+        <option value="{{ t.table_id }}">{{ t.table_number }} — {{ t.status }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="menu-search field">
+      <span>Search menu</span>
+      <input id="menuSearch" type="search" placeholder="Type to filter..." />
+    </div>
+    <div id="menuList">
+      {% for item in menu %}
+      <div
+        class="menu-row menu-item"
+        data-search="{{ item.name }} {{ item.category }}"
+        data-item-id="{{ item.item_id }}"
+        data-name="{{ item.name }}"
+        data-category="{{ item.category }}"
+        data-price="{{ item.price }}"
+      >
+        <div>
+          <strong>{{ item.name }}</strong>
+          <div class="muted small">{{ item.category }}</div>
+        </div>
+        <div>₹ {{ '%.2f'|format(item.price|float) }}</div>
+        <div>
+          <input
+            class="qty-input"
+            type="number"
+            min="0"
+            value="0"
+            data-item-id="{{ item.item_id }}"
+          />
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="items_json" id="itemsJson" value="[]" />
+    <script type="application/json" id="active-orders-data">{{ active_by_table | tojson }}</script>
+  </div>
+  <div class="card">
+    <h3>Summary</h3>
+    <div id="orderSummary"><p class="muted">No items yet.</p></div>
+    <div class="menu-item" style="margin-top: 10px">
+      <strong>Total</strong>
+      <strong id="orderTotal">₹ 0.00</strong>
+    </div>
+    <button class="btn btn-primary btn-block mt" type="submit" id="tableSubmitBtn">
+      Submit order &amp; print kitchen ticket
+    </button>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/order-cart.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    OrderCart.bind({
+      menuListId: 'menuList',
+      hiddenInputId: 'itemsJson',
+      summaryId: 'orderSummary',
+      totalId: 'orderTotal',
+      searchId: 'menuSearch'
+    });
+
+    var raw = document.getElementById('active-orders-data');
+    var activeByTable = raw ? JSON.parse(raw.textContent || '{}') : {};
+    var tableSelect = document.getElementById('tableIdSelect');
+    var hint = document.getElementById('tableOrderHint');
+    var submitBtn = document.getElementById('tableSubmitBtn');
+
+    function updateTableHint() {
+      if (!tableSelect || !hint || !submitBtn) return;
+      var tid = String(tableSelect.value);
+      var oid = activeByTable[tid];
+      if (oid) {
+        hint.style.display = 'block';
+        hint.textContent =
+          'This table already has open order #' +
+          oid +
+          '. Submitting will add these items to that order (saved only — no second kitchen print). Print the final bill from Billing when the guests finish.';
+        submitBtn.textContent = 'Save added items to order';
+      } else {
+        hint.style.display = 'none';
+        submitBtn.textContent = 'Submit order & print kitchen ticket';
+      }
+    }
+
+    if (tableSelect) {
+      tableSelect.addEventListener('change', updateTableHint);
+      updateTableHint();
+    }
+  });
+</script>
+{% endblock %}

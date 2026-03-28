@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block heading %}Reports & analytics{% endblock %}
+{% block subheading %}Sales mix and performance{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" class="grid grid-2" style="align-items:end;">
+    <label class="field">
+      <span>Month</span>
+      <input type="month" name="month" value="{{ month_str }}" />
+    </label>
+    <button class="btn btn-secondary" type="submit">Apply</button>
+  </form>
+</div>
+<div class="grid grid-3 mt">
+  <div class="card stat">
+    <div class="stat-label">Daily sales (paid, today)</div>
+    <div class="stat-value">₹ {{ '%.2f'|format(daily_sales) }}</div>
+  </div>
+  <div class="card stat">
+    <div class="stat-label">Monthly sales (paid)</div>
+    <div class="stat-value">₹ {{ '%.2f'|format(monthly_sales) }}</div>
+  </div>
+  <div class="card stat">
+    <div class="stat-label">Orders (table / parcel)</div>
+    <div class="stat-value">{{ table_cnt }} / {{ parcel_cnt }}</div>
+  </div>
+</div>
+<div class="card mt">
+  <h3>Top selling items (month)</h3>
+  <div style="overflow:auto;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qty sold</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in top_rows %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.qty }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2"><p class="muted">No data for this month.</p></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
