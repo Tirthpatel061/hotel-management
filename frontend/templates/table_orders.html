@@ -1,64 +1,100 @@
 {% extends "base.html" %}
 {% block title %}Dine-in — {{ brand_name }}{% endblock %}
 {% block heading %}Dine-in (table) orders{% endblock %}
-{% block subheading %}Choose the table, add dishes, then send to the kitchen. The first time for a table prints a ticket in the kitchen. If you add more food to the same table later, it is saved without printing again — print the customer’s bill from “Bills &amp; payment” when they leave.{% endblock %}
+{% block subheading %}First tap the table where guests are sitting, then add dishes and send to the kitchen. The first order for a table prints in the kitchen; extra items on the same table are saved without a second print — use “Bills &amp; payment” for the final bill when they leave.{% endblock %}
 {% block content %}
 <form method="post" class="order-grid" id="tableOrderForm">
   <div class="card">
-    <h3>1. Table &amp; dishes</h3>
+    <h3>Step 1 — Pick a table</h3>
     <p id="tableOrderHint" class="flash flash-info" style="display: none;"></p>
-    <label class="field">
-      <span>Which table?</span>
-      <select name="table_id" id="tableIdSelect" required>
-        {% for t in tables %}
-        <option value="{{ t.table_id }}">Table {{ t.table_number }} — {{ t.status }}</option>
-        {% endfor %}
-      </select>
-    </label>
-    <div class="menu-search field">
-      <span>Find a dish</span>
-      <input id="menuSearch" type="search" placeholder="Type part of the name…" />
-    </div>
-    <p class="muted small" style="margin: 0 0 8px;">Set quantity (0 = don’t order).</p>
-    <div id="menuList">
-      {% for item in menu %}
-      <div
-        class="menu-row menu-item"
-        data-search="{{ item.name }} {{ item.category }}"
-        data-item-id="{{ item.item_id }}"
-        data-name="{{ item.name }}"
-        data-category="{{ item.category }}"
-        data-price="{{ item.price }}"
-      >
-        <div>
-          <strong>{{ item.name }}</strong>
-          <div class="muted small">{{ item.category }}</div>
-        </div>
-        <div>₹ {{ '%.2f'|format(item.price|float) }}</div>
-        <div>
-          <input
-            class="qty-input"
-            type="number"
-            min="0"
-            value="0"
-            data-item-id="{{ item.item_id }}"
-            aria-label="Quantity for {{ item.name }}"
-          />
-        </div>
+    {% if tables %}
+    <div class="table-picker-wrap">
+      <p class="muted small" style="margin: 0 0 10px;">
+        <strong>Tap one block</strong> — the thick border shows which table is selected.
+      </p>
+      <div class="table-picker-legend" aria-hidden="true">
+        <span><i class="legend-free"></i> Free table</span>
+        <span><i class="legend-busy"></i> Guests sitting</span>
+        <span><i class="legend-clean"></i> Being cleaned</span>
       </div>
-      {% endfor %}
+      <div class="table-picker" role="radiogroup" aria-label="Choose dining table">
+        {% for t in tables %}
+        {% set oid = active_by_table[t.table_id] if t.table_id in active_by_table else none %}
+        {% set st = t.status|lower %}
+        <label
+          class="table-block table-block--{{ st }}"
+        >
+          <input
+            type="radio"
+            name="table_id"
+            value="{{ t.table_id }}"
+            {% if loop.first %}required{% endif %}
+            {% if loop.first %}checked{% endif %}
+          />
+          <span class="table-block__num">{{ t.table_number }}</span>
+          <span class="table-block__title">Table</span>
+          <span class="table-block__status">
+            {% if t.status == 'Available' %}Free — empty{% elif t.status == 'Occupied' %}Guests here{% else %}Cleaning{% endif %}
+          </span>
+          {% if oid %}
+          <span class="table-block__order">Open order #{{ oid }}</span>
+          {% endif %}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <p class="flash flash-warning">No tables are set up yet. Ask a manager to add tables in the system.</p>
+    {% endif %}
+
+    <div class="order-section">
+      <h4>Step 2 — Add dishes</h4>
+      <div class="menu-search field">
+        <span>Find a dish</span>
+        <input id="menuSearch" type="search" placeholder="Type part of the name…" autocomplete="off" />
+      </div>
+      <p class="muted small" style="margin: 0 0 8px;">Use the number box for how many of each dish (leave 0 if not ordering).</p>
+      <div id="menuList">
+        {% for item in menu %}
+        <div
+          class="menu-row menu-item"
+          data-search="{{ item.name }} {{ item.category }}"
+          data-item-id="{{ item.item_id }}"
+          data-name="{{ item.name }}"
+          data-category="{{ item.category }}"
+          data-price="{{ item.price }}"
+        >
+          <div>
+            <strong>{{ item.name }}</strong>
+            <div class="muted small">{{ item.category }}</div>
+          </div>
+          <div>₹ {{ '%.2f'|format(item.price|float) }}</div>
+          <div>
+            <input
+              class="qty-input"
+              type="number"
+              min="0"
+              value="0"
+              data-item-id="{{ item.item_id }}"
+              aria-label="Quantity for {{ item.name }}"
+            />
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
     <input type="hidden" name="items_json" id="itemsJson" value="[]" />
     <script type="application/json" id="active-orders-data">{{ active_by_table | tojson }}</script>
   </div>
   <div class="card">
-    <h3>2. Check &amp; send</h3>
+    <h3>Your order</h3>
+    <p class="muted small" style="margin-top: 0;">Check the list and total before sending.</p>
     <div id="orderSummary"><p class="muted">Nothing added yet.</p></div>
     <div class="menu-item" style="margin-top: 10px">
       <strong>Total</strong>
       <strong id="orderTotal">₹ 0.00</strong>
     </div>
-    <button class="btn btn-primary btn-block mt" type="submit" id="tableSubmitBtn">
+    <button class="btn btn-primary btn-block mt" type="submit" id="tableSubmitBtn" {% if not tables %}disabled{% endif %}>
       Send to kitchen &amp; print ticket
     </button>
   </div>
@@ -78,20 +114,25 @@
 
     var raw = document.getElementById('active-orders-data');
     var activeByTable = raw ? JSON.parse(raw.textContent || '{}') : {};
-    var tableSelect = document.getElementById('tableIdSelect');
+    var radios = document.querySelectorAll('input[name="table_id"]');
     var hint = document.getElementById('tableOrderHint');
     var submitBtn = document.getElementById('tableSubmitBtn');
 
+    function currentTableId() {
+      var c = document.querySelector('input[name="table_id"]:checked');
+      return c ? String(c.value) : '';
+    }
+
     function updateTableHint() {
-      if (!tableSelect || !hint || !submitBtn) return;
-      var tid = String(tableSelect.value);
+      if (!hint || !submitBtn) return;
+      var tid = currentTableId();
       var oid = activeByTable[tid];
       if (oid) {
         hint.style.display = 'block';
         hint.textContent =
           'This table already has order number ' +
           oid +
-          ' open. What you add now will be joined to that order (no second print in the kitchen). When guests finish, print their bill from “Bills & payment”.';
+          ' open. What you add now will be added to that same order (the kitchen will not print again). When guests finish, print their bill from “Bills & payment”.';
         submitBtn.textContent = 'Save extra items to this order';
       } else {
         hint.style.display = 'none';
@@ -99,10 +140,10 @@
       }
     }
 
-    if (tableSelect) {
-      tableSelect.addEventListener('change', updateTableHint);
-      updateTableHint();
-    }
+    radios.forEach(function (r) {
+      r.addEventListener('change', updateTableHint);
+    });
+    updateTableHint();
   });
 </script>
 {% endblock %}
