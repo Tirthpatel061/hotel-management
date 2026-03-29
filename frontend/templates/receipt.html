@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Receipt{% endblock %}
-{% block heading %}Receipt{% endblock %}
-{% block subheading %}Print-friendly bill{% endblock %}
+{% block title %}Bill — {{ brand_name }}{% endblock %}
+{% block heading %}Customer bill{% endblock %}
+{% block subheading %}Print or save this page for the guest.{% endblock %}
 {% block actions %}
 <button class="btn btn-primary no-print" type="button" onclick="window.print()">Print</button>
 {% endblock %}
@@ -15,20 +15,20 @@
     />
     <h2 style="margin:8px 0 0;">{{ brand_name }}</h2>
     <div class="muted">{{ brand_tagline }}</div>
-    <div class="muted">Tax invoice</div>
+    <div class="muted">Tax invoice (GST)</div>
   </div>
   <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;">
     <div>
-      <div><strong>Bill #</strong> {{ bill.bill_id }}</div>
-      <div><strong>Order #</strong> {{ order.order_id }}</div>
-      <div><strong>Type</strong> {{ order.order_type }}</div>
+      <div><strong>Bill number</strong> {{ bill.bill_id }}</div>
+      <div><strong>Order number</strong> {{ order.order_id }}</div>
+      <div><strong>Type</strong> {% if order.order_type == 'table' %}Dine-in{% elif order.order_type == 'parcel' %}Takeaway{% else %}{{ order.order_type }}{% endif %}</div>
     </div>
     <div style="text-align:right;">
-      <div>{{ order.order_time.strftime('%Y-%m-%d %H:%M') }}</div>
+      <div>{{ order.order_time.strftime('%d-%m-%Y %H:%M') }}</div>
       {% if order.order_type == 'table' and order.table %}
       <div><strong>Table</strong> {{ order.table.table_number }}</div>
       {% elif order.order_type == 'parcel' %}
-      <div><strong>Customer</strong> {{ order.parcel_customer_name }}</div>
+      <div><strong>Guest</strong> {{ order.parcel_customer_name }}</div>
       <div>{{ order.parcel_phone }}</div>
       {% endif %}
     </div>
@@ -54,7 +54,7 @@
     </tbody>
   </table>
   <div style="margin-top:12px;text-align:right;">
-    <div>Subtotal: ₹ {{ '%.2f'|format(bill.subtotal|float) }}</div>
+    <div>Before tax: ₹ {{ '%.2f'|format(bill.subtotal|float) }}</div>
     <div>GST: ₹ {{ '%.2f'|format(bill.gst_amount|float) }}</div>
     <div><strong>Total: ₹ {{ '%.2f'|format(bill.total_amount|float) }}</strong></div>
     <div class="muted">Payment: {{ bill.payment_status }} — {{ bill.payment_method }}</div>

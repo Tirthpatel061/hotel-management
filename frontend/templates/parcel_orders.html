@@ -1,23 +1,24 @@
 {% extends "base.html" %}
-{% block title %}Parcel orders{% endblock %}
-{% block heading %}Parcel / takeaway{% endblock %}
-{% block subheading %}Customer details and items{% endblock %}
+{% block title %}Takeaway — {{ brand_name }}{% endblock %}
+{% block heading %}Takeaway order{% endblock %}
+{% block subheading %}For packed food or delivery: customer name, phone, then choose dishes and confirm.{% endblock %}
 {% block content %}
 <form method="post" class="order-grid">
   <div class="card">
     <h3>Customer</h3>
     <label class="field">
       <span>Name</span>
-      <input name="customer_name" required />
+      <input name="customer_name" required placeholder="Customer name" />
     </label>
     <label class="field">
-      <span>Phone</span>
-      <input name="customer_phone" required />
+      <span>Mobile number</span>
+      <input name="customer_phone" required placeholder="10-digit number" />
     </label>
     <div class="menu-search field">
-      <span>Search menu</span>
-      <input id="menuSearch" type="search" placeholder="Type to filter..." />
+      <span>Find a dish</span>
+      <input id="menuSearch" type="search" placeholder="Type part of the name…" />
     </div>
+    <p class="muted small" style="margin: 0 0 8px;">Set quantity (0 = don’t order).</p>
     <div id="menuList">
       {% for item in menu %}
       <div
@@ -40,6 +41,7 @@
             min="0"
             value="0"
             data-item-id="{{ item.item_id }}"
+            aria-label="Quantity for {{ item.name }}"
           />
         </div>
       </div>
@@ -48,13 +50,13 @@
     <input type="hidden" name="items_json" id="itemsJson" value="[]" />
   </div>
   <div class="card">
-    <h3>Summary</h3>
-    <div id="orderSummary"><p class="muted">No items yet.</p></div>
+    <h3>Total &amp; confirm</h3>
+    <div id="orderSummary"><p class="muted">Nothing added yet.</p></div>
     <div class="menu-item" style="margin-top: 10px">
       <strong>Total</strong>
       <strong id="orderTotal">₹ 0.00</strong>
     </div>
-    <button class="btn btn-primary btn-block mt" type="submit">Create parcel order</button>
+    <button class="btn btn-primary btn-block mt" type="submit">Save takeaway order</button>
   </div>
 </form>
 {% endblock %}

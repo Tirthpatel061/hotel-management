@@ -1,24 +1,25 @@
 {% extends "base.html" %}
-{% block title %}Table orders{% endblock %}
-{% block heading %}Table orders{% endblock %}
-{% block subheading %}First submit prints a kitchen ticket (KOT). Extra items on the same table are saved to the same order — print the final bill from Billing when done.{% endblock %}
+{% block title %}Dine-in — {{ brand_name }}{% endblock %}
+{% block heading %}Dine-in (table) orders{% endblock %}
+{% block subheading %}Choose the table, add dishes, then send to the kitchen. The first time for a table prints a ticket in the kitchen. If you add more food to the same table later, it is saved without printing again — print the customer’s bill from “Bills &amp; payment” when they leave.{% endblock %}
 {% block content %}
 <form method="post" class="order-grid" id="tableOrderForm">
   <div class="card">
-    <h3>Order details</h3>
+    <h3>1. Table &amp; dishes</h3>
     <p id="tableOrderHint" class="flash flash-info" style="display: none;"></p>
     <label class="field">
-      <span>Table</span>
+      <span>Which table?</span>
       <select name="table_id" id="tableIdSelect" required>
         {% for t in tables %}
-        <option value="{{ t.table_id }}">{{ t.table_number }} — {{ t.status }}</option>
+        <option value="{{ t.table_id }}">Table {{ t.table_number }} — {{ t.status }}</option>
         {% endfor %}
       </select>
     </label>
     <div class="menu-search field">
-      <span>Search menu</span>
-      <input id="menuSearch" type="search" placeholder="Type to filter..." />
+      <span>Find a dish</span>
+      <input id="menuSearch" type="search" placeholder="Type part of the name…" />
     </div>
+    <p class="muted small" style="margin: 0 0 8px;">Set quantity (0 = don’t order).</p>
     <div id="menuList">
       {% for item in menu %}
       <div
@@ -41,6 +42,7 @@
             min="0"
             value="0"
             data-item-id="{{ item.item_id }}"
+            aria-label="Quantity for {{ item.name }}"
           />
         </div>
       </div>
@@ -50,14 +52,14 @@
     <script type="application/json" id="active-orders-data">{{ active_by_table | tojson }}</script>
   </div>
   <div class="card">
-    <h3>Summary</h3>
-    <div id="orderSummary"><p class="muted">No items yet.</p></div>
+    <h3>2. Check &amp; send</h3>
+    <div id="orderSummary"><p class="muted">Nothing added yet.</p></div>
     <div class="menu-item" style="margin-top: 10px">
       <strong>Total</strong>
       <strong id="orderTotal">₹ 0.00</strong>
     </div>
     <button class="btn btn-primary btn-block mt" type="submit" id="tableSubmitBtn">
-      Submit order &amp; print kitchen ticket
+      Send to kitchen &amp; print ticket
     </button>
   </div>
 </form>
@@ -87,13 +89,13 @@
       if (oid) {
         hint.style.display = 'block';
         hint.textContent =
-          'This table already has open order #' +
+          'This table already has order number ' +
           oid +
-          '. Submitting will add these items to that order (saved only — no second kitchen print). Print the final bill from Billing when the guests finish.';
-        submitBtn.textContent = 'Save added items to order';
+          ' open. What you add now will be joined to that order (no second print in the kitchen). When guests finish, print their bill from “Bills & payment”.';
+        submitBtn.textContent = 'Save extra items to this order';
       } else {
         hint.style.display = 'none';
-        submitBtn.textContent = 'Submit order & print kitchen ticket';
+        submitBtn.textContent = 'Send to kitchen & print ticket';
       }
     }
 

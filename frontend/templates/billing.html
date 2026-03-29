@@ -1,19 +1,19 @@
 {% extends "base.html" %}
-{% block title %}Billing{% endblock %}
-{% block heading %}Billing{% endblock %}
-{% block subheading %}Invoices, GST, and payments{% endblock %}
+{% block title %}Bills — {{ brand_name }}{% endblock %}
+{% block heading %}Bills &amp; payment{% endblock %}
+{% block subheading %}See every bill, print a copy, and mark when money is received.{% endblock %}
 {% block content %}
 <div class="card">
   <div style="overflow:auto;">
     <table class="table">
       <thead>
         <tr>
-          <th>Bill #</th>
-          <th>Order</th>
-          <th>Type</th>
-          <th>Total</th>
-          <th>GST</th>
-          <th>Payment</th>
+          <th>Bill no.</th>
+          <th>Order no.</th>
+          <th>Kind</th>
+          <th>Amount</th>
+          <th>Tax (GST)</th>
+          <th>Paid?</th>
           <th></th>
         </tr>
       </thead>
@@ -22,16 +22,18 @@
         <tr>
           <td>{{ b.bill_id }}</td>
           <td>#{{ b.order_id }}</td>
-          <td>{{ b.order.order_type }}</td>
+          <td>
+            {% if b.order.order_type == 'table' %}Dine-in{% elif b.order.order_type == 'parcel' %}Takeaway{% else %}{{ b.order.order_type }}{% endif %}
+          </td>
           <td>₹ {{ '%.2f'|format(b.total_amount|float) }}</td>
           <td>₹ {{ '%.2f'|format(b.gst_amount|float) }}</td>
-          <td>{{ b.payment_status }} ({{ b.payment_method }})</td>
+          <td>{{ b.payment_status }} — {{ b.payment_method }}</td>
           <td class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;">
             <a class="btn btn-secondary" href="{{ url_for('billing.receipt', bill_id=b.bill_id) }}">View / print</a>
             {% if b.payment_status != 'Paid' %}
             <form method="post" action="{{ url_for('billing.mark_paid', bill_id=b.bill_id) }}">
               <input type="hidden" name="payment_method" value="Cash" />
-              <button class="btn btn-primary" type="submit">Mark paid</button>
+              <button class="btn btn-primary" type="submit">Record cash paid</button>
             </form>
             {% endif %}
           </td>

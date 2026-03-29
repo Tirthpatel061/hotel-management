@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Attendance{% endblock %}
-{% block heading %}Attendance{% endblock %}
-{% block subheading %}Mark daily presence for each staff member{% endblock %}
+{% block title %}Attendance — {{ brand_name }}{% endblock %}
+{% block heading %}Who came to work?{% endblock %}
+{% block subheading %}Pick a date, mark each person present or absent, then save.{% endblock %}
 {% block content %}
 <div class="card">
   <form method="get" class="grid grid-2" style="align-items:end;">
@@ -9,19 +9,19 @@
       <span>Date</span>
       <input type="date" name="att_date" value="{{ att_date.isoformat() }}" />
     </label>
-    <button class="btn btn-secondary" type="submit">Load</button>
+    <button class="btn btn-secondary" type="submit">Show this date</button>
   </form>
 </div>
 <form method="post" class="card mt">
   <input type="hidden" name="att_date" value="{{ att_date.isoformat() }}" />
-  <h3>Mark attendance — {{ att_date.strftime('%d %b %Y') }}</h3>
+  <h3>{{ att_date.strftime('%d %b %Y') }}</h3>
   <div style="overflow:auto;">
     <table class="table">
       <thead>
         <tr>
-          <th>Staff</th>
-          <th>Role</th>
-          <th>Status</th>
+          <th>Name</th>
+          <th>Job</th>
+          <th>Here today?</th>
         </tr>
       </thead>
       <tbody>
@@ -40,17 +40,17 @@
       </tbody>
     </table>
   </div>
-  <button class="btn btn-primary mt" type="submit">Save attendance</button>
+  <button class="btn btn-primary mt" type="submit">Save for this date</button>
 </form>
 <div class="card mt">
-  <h3>Recent history</h3>
+  <h3>Recent days (quick look)</h3>
   <div style="overflow:auto;">
     <table class="table">
       <thead>
         <tr>
           <th>Date</th>
           <th>Staff ID</th>
-          <th>Status</th>
+          <th>Here?</th>
         </tr>
       </thead>
       <tbody>

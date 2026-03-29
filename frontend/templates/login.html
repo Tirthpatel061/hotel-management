@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login — {{ brand_name }}</title>
+    <title>Sign in — {{ brand_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   </head>
   <body class="auth-body">
@@ -20,16 +20,16 @@
           <div class="brand-title">{{ brand_name }}</div>
           <p class="brand-sub">{{ brand_tagline }}</p>
           <p class="brand-sub brand-sub-2">{{ brand_tagline_2 }}</p>
-          <p class="brand-sub brand-sub-muted">Staff sign in</p>
+          <p class="brand-sub brand-sub-muted">Staff only — sign in to use the system</p>
         </div>
       </div>
       <div class="brand-meta brand-meta-center">
         <div class="brand-links">
-          <a href="{{ brand_website }}" target="_blank" rel="noopener noreferrer">swagatcorner.com</a>
-          <a href="{{ brand_menu_pdf }}" target="_blank" rel="noopener noreferrer">Menu PDF</a>
+          <a href="{{ brand_website }}" target="_blank" rel="noopener noreferrer">Website</a>
+          <a href="{{ brand_menu_pdf }}" target="_blank" rel="noopener noreferrer">Menu (PDF)</a>
           <a href="{{ brand_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
         </div>
-        <p class="muted small">Since {{ brand_since }} · Vadodara</p>
+        <p class="muted small">Serving Vadodara since {{ brand_since }}</p>
       </div>
       {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -42,8 +42,8 @@
       {% endwith %}
       <form method="post" class="form-grid">
         <label class="field">
-          <span>Username</span>
-          <input name="username" autocomplete="username" required />
+          <span>Your login name</span>
+          <input name="username" autocomplete="username" required placeholder="e.g. admin" />
         </label>
         <label class="field">
           <span>Password</span>
@@ -51,7 +51,9 @@
         </label>
         <button class="btn btn-primary btn-block" type="submit">Sign in</button>
       </form>
-      <p class="muted small">Default demo: <strong>admin</strong> / <strong>admin123</strong> (after seed)</p>
+      <p class="muted small" style="margin-top: 1rem;">
+        First-time setup: after loading the database, you can use the sample manager login from your setup notes (change the password in real use).
+      </p>
     </div>
   </body>
 </html>

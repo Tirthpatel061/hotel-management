@@ -1,42 +1,46 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — Hotel Management{% endblock %}
-{% block heading %}Dashboard{% endblock %}
-{% block subheading %}Overview of today’s operations{% endblock %}
+{% block title %}Home — {{ brand_name }}{% endblock %}
+{% block heading %}Home{% endblock %}
+{% block subheading %}A quick look at today — tables, orders, and money collected.{% endblock %}
 {% block content %}
 <div class="grid grid-3">
   <div class="card stat">
-    <div class="stat-label">Total tables</div>
+    <div class="stat-label">Tables in the hall</div>
     <div class="stat-value">{{ total_tables }}</div>
+    <div class="stat-note">How many tables you can use</div>
   </div>
   <div class="card stat">
-    <div class="stat-label">Active orders</div>
+    <div class="stat-label">Open orders now</div>
     <div class="stat-value">{{ active_orders }}</div>
+    <div class="stat-note">Not yet finished or paid</div>
   </div>
   <div class="card stat">
-    <div class="stat-label">Parcel today</div>
+    <div class="stat-label">Takeaway orders today</div>
     <div class="stat-value">{{ parcel_today }}</div>
   </div>
   <div class="card stat">
-    <div class="stat-label">Daily revenue (paid)</div>
+    <div class="stat-label">Money taken in today (paid)</div>
     <div class="stat-value">₹ {{ '%.2f'|format(daily_revenue|float) }}</div>
   </div>
   <div class="card stat">
-    <div class="stat-label">Staff present today</div>
+    <div class="stat-label">Staff marked present</div>
     <div class="stat-value">{{ staff_present }} / {{ total_staff }}</div>
+    <div class="stat-note">Out of people on the team</div>
   </div>
   <div class="card stat">
-    <div class="stat-label">Live orders</div>
+    <div class="stat-label">Open orders (live)</div>
     <div class="stat-value" id="live-active-orders">—</div>
-    <div class="muted small">Updates via SSE / API</div>
+    <div class="stat-note">Updates by itself while this page is open</div>
   </div>
 </div>
 <div class="card mt">
-  <h3>Quick navigation</h3>
+  <h3>Go to…</h3>
+  <p class="muted small" style="margin: 0 0 12px;">Common tasks — tap the one you need.</p>
   <div class="quick-links">
-    <a class="btn btn-secondary" href="{{ url_for('orders.table_orders') }}">New table order</a>
-    <a class="btn btn-secondary" href="{{ url_for('orders.parcel_orders') }}">New parcel</a>
-    <a class="btn btn-secondary" href="{{ url_for('kitchen.board') }}">Kitchen board</a>
-    <a class="btn btn-secondary" href="{{ url_for('billing.list_bills') }}">Billing</a>
+    <a class="btn btn-secondary" href="{{ url_for('orders.table_orders') }}">New dine-in order</a>
+    <a class="btn btn-secondary" href="{{ url_for('orders.parcel_orders') }}">New takeaway order</a>
+    <a class="btn btn-secondary" href="{{ url_for('kitchen.board') }}">Kitchen screen</a>
+    <a class="btn btn-secondary" href="{{ url_for('billing.list_bills') }}">Bills &amp; payment</a>
   </div>
 </div>
 {% endblock %}

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Kitchen{% endblock %}
-{% block heading %}Kitchen dashboard{% endblock %}
-{% block subheading %}Advance orders: Preparing → Ready → Served / Delivered{% endblock %}
+{% block title %}Kitchen — {{ brand_name }}{% endblock %}
+{% block heading %}Kitchen screen{% endblock %}
+{% block subheading %}Each card is one order. Use the button to move it along: cooking → ready → served or handed over.{% endblock %}
 {% block actions %}
-<div class="pill">Live orders: <span id="kitchen-live">—</span></div>
+<div class="pill">Orders still open: <span id="kitchen-live">—</span></div>
 {% endblock %}
 {% block content %}
 <div class="kitchen-grid">
@@ -11,29 +11,33 @@
   <div class="kitchen-card">
     <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
       <div>
-        <div class="pill">{{ order.order_type }}</div>
+        <div class="pill">
+          {% if order.order_type == 'table' %}Dine-in{% elif order.order_type == 'parcel' %}Takeaway{% else %}{{ order.order_type }}{% endif %}
+        </div>
         <h3 style="margin:8px 0 4px;">
           {% if order.order_type == 'table' and order.table %}
-            {{ order.table.table_number }}
+            Table {{ order.table.table_number }}
           {% elif order.order_type == 'parcel' %}
-            Parcel — {{ order.parcel_customer_name }}
+            Takeaway — {{ order.parcel_customer_name }}
           {% else %}
             Order #{{ order.order_id }}
           {% endif %}
         </h3>
-        <div class="muted small">#{{ order.order_id }} · {{ order.order_time.strftime('%Y-%m-%d %H:%M') }}</div>
+        <div class="muted small">Order ref #{{ order.order_id }} · {{ order.order_time.strftime('%d-%m-%Y %H:%M') }}</div>
         {% if order.order_type == 'parcel' %}
-        <div class="muted small">{{ order.parcel_phone }}</div>
+        <div class="muted small">Phone: {{ order.parcel_phone }}</div>
         {% endif %}
       </div>
-      <div class="pill">{{ order.status }}</div>
+      <div class="pill">
+        {% if order.status == 'Pending' %}Waiting to start{% elif order.status == 'Preparing' %}Cooking now{% elif order.status == 'Ready' %}Ready to hand out{% elif order.status == 'Served' %}Served at table{% elif order.status == 'Delivered' %}Handed to customer{% else %}{{ order.status }}{% endif %}
+      </div>
     </div>
     <table class="table">
       <thead>
         <tr>
-          <th>Item</th>
+          <th>Dish</th>
           <th>Qty</th>
-          <th>Price</th>
+          <th>Rate</th>
         </tr>
       </thead>
       <tbody>
@@ -47,11 +51,11 @@
       </tbody>
     </table>
     <form method="post" action="{{ url_for('kitchen.update_status', order_id=order.order_id) }}">
-      <button class="btn btn-primary" type="submit">Mark next status</button>
+      <button class="btn btn-primary" type="submit">Move to next step</button>
     </form>
   </div>
   {% else %}
-  <div class="card"><p class="muted">No active kitchen orders.</p></div>
+  <div class="card"><p class="muted">No orders waiting in the kitchen right now.</p></div>
   {% endfor %}
 </div>
 {% endblock %}

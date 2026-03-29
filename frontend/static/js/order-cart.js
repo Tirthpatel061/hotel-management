@@ -17,7 +17,7 @@
       html += '<div><strong>₹' + line.toFixed(2) + '</strong></div>';
       html += '</div>';
     });
-    container.innerHTML = html || '<p class="muted">No items yet.</p>';
+    container.innerHTML = html || '<p class="muted">No dishes selected yet.</p>';
     if (totalEl) totalEl.textContent = '₹ ' + subtotal.toFixed(2);
     return subtotal;
   }

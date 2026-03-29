@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Salary{% endblock %}
-{% block heading %}Salary management{% endblock %}
-{% block subheading %}Pro-rated by attendance (Mon–Sat working days){% endblock %}
+{% block title %}Monthly pay — {{ brand_name }}{% endblock %}
+{% block heading %}Monthly pay (salary){% endblock %}
+{% block subheading %}Pay is adjusted by how many days each person was present (Monday–Saturday counted as work days in the system).{% endblock %}
 {% block content %}
 <div class="card">
   <form method="get" class="grid grid-2" style="align-items:end;">
@@ -9,26 +9,26 @@
       <span>Month</span>
       <input type="month" name="month_year" value="{{ month_year }}" />
     </label>
-    <button class="btn btn-secondary" type="submit">Load</button>
+    <button class="btn btn-secondary" type="submit">Load month</button>
   </form>
   <form method="post" class="mt">
     <input type="hidden" name="month_year" value="{{ month_year }}" />
     <input type="hidden" name="action" value="compute" />
-    <button class="btn btn-primary" type="submit">Compute / refresh salaries</button>
+    <button class="btn btn-primary" type="submit">Calculate pay for this month</button>
   </form>
 </div>
 <div class="card mt">
-  <h3>Records for {{ month_year }}</h3>
+  <h3>{{ month_year }}</h3>
   <div style="overflow:auto;">
     <table class="table">
       <thead>
         <tr>
-          <th>Staff</th>
-          <th>Base</th>
-          <th>Present</th>
-          <th>Working days</th>
-          <th>Total</th>
-          <th>Status</th>
+          <th>Name</th>
+          <th>Base pay</th>
+          <th>Days present</th>
+          <th>Work days in month</th>
+          <th>Amount to pay</th>
+          <th>Paid?</th>
           <th></th>
         </tr>
       </thead>
@@ -44,13 +44,13 @@
           <td>
             {% if r.payment_status != 'Paid' %}
             <form method="post" action="{{ url_for('salary.mark_paid', salary_id=r.salary_id) }}" style="display:inline;">
-              <button class="btn btn-secondary" type="submit">Mark paid</button>
+              <button class="btn btn-secondary" type="submit">Mark as paid</button>
             </form>
             {% endif %}
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="7"><p class="muted">No salary records yet. Run compute for this month.</p></td></tr>
+        <tr><td colspan="7"><p class="muted">Nothing here yet. Pick the month and press “Calculate pay”.</p></td></tr>
         {% endfor %}
       </tbody>
     </table>

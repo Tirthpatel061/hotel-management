@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kitchen ticket #{{ order.order_id }} — {{ brand_name }}</title>
+    <title>Kitchen list #{{ order.order_id }} — {{ brand_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/kot.css') }}" />
   </head>
   <body class="kot-page">
     <div class="kot-toolbar no-print">
-      <a class="kot-back" href="{{ url_for('orders.table_orders') }}">← Back to table orders</a>
+      <a class="kot-back" href="{{ url_for('orders.table_orders') }}">← Back to dine-in</a>
       <button type="button" class="kot-btn" onclick="window.print()">Print again</button>
     </div>
 
@@ -23,11 +23,11 @@
         {% endif %}
         <h1 class="kot-title">{{ brand_name }}</h1>
         <p class="kot-sub">{{ brand_tagline_2 }}</p>
-        <p class="kot-badge">KITCHEN ORDER (KOT)</p>
+        <p class="kot-badge">FOR KITCHEN — COOK THIS ORDER</p>
       </header>
 
       <section class="kot-meta">
-        <div><strong>Order #</strong> {{ order.order_id }}</div>
+        <div><strong>Order no.</strong> {{ order.order_id }}</div>
         <div><strong>Table</strong> {{ order.table.table_number if order.table else '—' }}</div>
         <div><strong>Time</strong> {{ order.order_time.strftime('%d-%m-%Y %H:%M') }}</div>
       </section>
@@ -35,7 +35,7 @@
       <table class="kot-table">
         <thead>
           <tr>
-            <th>Item</th>
+            <th>Dish</th>
             <th>Qty</th>
           </tr>
         </thead>
@@ -49,7 +49,7 @@
         </tbody>
       </table>
 
-      <p class="kot-foot no-print muted">This window printed automatically. Use Billing to print the final bill after service.</p>
+      <p class="kot-foot no-print muted">This page tried to print by itself. For the guest’s bill, use “Bills &amp; payment” when they finish.</p>
     </article>
 
     <script>

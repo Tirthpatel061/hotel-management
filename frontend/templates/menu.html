@@ -1,40 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Menu{% endblock %}
-{% block heading %}Menu management{% endblock %}
-{% block subheading %}Add, edit, or remove items{% endblock %}
+{% block title %}Menu &amp; prices — {{ brand_name }}{% endblock %}
+{% block heading %}Food menu &amp; prices{% endblock %}
+{% block subheading %}Add new dishes or change names, prices, and what is available today.{% endblock %}
 {% block content %}
 <div class="card">
-  <h3>Add item</h3>
+  <h3>Add a dish</h3>
   <form method="post" action="{{ url_for('menu.add_item') }}" class="grid grid-2" style="align-items:end;">
     <label class="field">
-      <span>Name</span>
+      <span>Dish name</span>
       <input name="name" required />
     </label>
     <label class="field">
-      <span>Category</span>
+      <span>Section (e.g. Starters)</span>
       <input name="category" required />
     </label>
     <label class="field">
-      <span>Price</span>
+      <span>Price (₹)</span>
       <input name="price" type="number" step="0.01" min="0" required />
     </label>
     <label class="field">
-      <span>Available</span>
-      <label class="muted small"><input type="checkbox" name="availability" checked /> Yes</label>
+      <span>On menu today?</span>
+      <label class="muted small"><input type="checkbox" name="availability" checked /> Yes, show to staff</label>
     </label>
-    <button class="btn btn-primary" type="submit">Add</button>
+    <button class="btn btn-primary" type="submit">Add dish</button>
   </form>
 </div>
 <div class="card mt">
-  <h3>Current menu</h3>
+  <h3>Current list</h3>
   <div style="overflow:auto;">
     <table class="table">
       <thead>
         <tr>
           <th>Name</th>
-          <th>Category</th>
+          <th>Section</th>
           <th>Price</th>
-          <th>Available</th>
+          <th>Shown?</th>
           <th></th>
         </tr>
       </thead>
@@ -57,8 +57,8 @@
             <input type="checkbox" name="availability" form="edit-{{ item.item_id }}" {% if item.availability %}checked{% endif %} />
           </td>
           <td style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-secondary" type="submit" form="edit-{{ item.item_id }}">Save</button>
-            <button class="btn btn-danger" type="submit" form="del-{{ item.item_id }}">Delete</button>
+            <button class="btn btn-secondary" type="submit" form="edit-{{ item.item_id }}">Save row</button>
+            <button class="btn btn-danger" type="submit" form="del-{{ item.item_id }}">Remove</button>
           </td>
         </tr>
         {% endfor %}
@@ -71,7 +71,7 @@
     id="del-{{ item.item_id }}"
     method="post"
     action="{{ url_for('menu.delete_item', item_id=item.item_id) }}"
-    onsubmit="return confirm('Delete this item?');"
+    onsubmit="return confirm('Remove this dish from the menu?');"
   ></form>
   {% endfor %}
 </div>
